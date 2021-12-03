@@ -1,4 +1,4 @@
-# ETON_GarmentsMatch
+# ETON Scripts - GarmentsMatch
  
 __!! THIS SCRIPT OVERWRITES ORIGINAL FILES !!__
 
