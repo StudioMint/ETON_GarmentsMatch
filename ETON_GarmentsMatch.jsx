@@ -108,9 +108,9 @@ function init() {
         if (returnBack) return;
     } else {
         folderMatch = new Folder(scriptFolder + "/Garments to Colour Match");
-        if (!folderMatch.exist) throw new Error("The folder \"Garments to Colour Match\" does not exist in the script location");
+        // if (!folderMatch.exist) throw new Error("The folder \"Garments to Colour Match\" does not exist in the script location");
         folderPSD = new Folder(scriptFolder + "/Images to work on");
-        if (!folderPSD.exist) throw new Error("The folder \"Images to work on\" does not exist in the script location");
+        // if (!folderPSD.exist) throw new Error("The folder \"Images to work on\" does not exist in the script location");
     }
 
     filesMatch = folderMatch.getFiles("*.jpg");
@@ -164,7 +164,7 @@ function main() {
             open(listPSD[i].file);
             try {
 
-                if (activeDocument.layers.length > 1) throw new Error(activeDocument.name + " has a populated layer structure");
+                // if (activeDocument.layers.length > 1) throw new Error(activeDocument.name + " has a populated layer structure");
                 
                 if (!failedToCopy && previousImage != undefined && listPSD[i].match == previousImage.match) {
                     try {
