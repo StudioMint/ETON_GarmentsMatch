@@ -147,8 +147,8 @@ function main() {
         for (j = 0; j < listMatch.length; j++) {
             if (listMatch[j].id == listPSD[i].id) {
                 switch (listMatch[j].angle) {
-                    case "tshgh_1": if (matchStatus < 5) listPSD[i].match = listMatch[j].file; matchStatus = 5; break;
-                    case "tshov_1": if (matchStatus < 4) listPSD[i].match = listMatch[j].file; matchStatus = 4; break;
+                    case "tshov_1": if (matchStatus < 5) listPSD[i].match = listMatch[j].file; matchStatus = 5; break;
+                    case "tshgh_1": if (matchStatus < 4) listPSD[i].match = listMatch[j].file; matchStatus = 4; break;
                     case "tshco_1": if (matchStatus < 3) listPSD[i].match = listMatch[j].file; matchStatus = 3; break;
                     case "tshde_1": if (matchStatus < 2) listPSD[i].match = listMatch[j].file; matchStatus = 2; break;
                     case "tshpi_1": if (matchStatus < 1) listPSD[i].match = listMatch[j].file; matchStatus = 1; break;
@@ -165,6 +165,11 @@ function main() {
             try {
 
                 // if (activeDocument.layers.length > 1) throw new Error(activeDocument.name + " has a populated layer structure");
+                try {
+                    activeDocument.activeLayer = activeDocument.layerSets.getByName("Garment Colour Match");
+                    activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+                    continue;
+                } catch(e) {}
                 
                 if (!failedToCopy && previousImage != undefined && listPSD[i].match == previousImage.match) {
                     try {
