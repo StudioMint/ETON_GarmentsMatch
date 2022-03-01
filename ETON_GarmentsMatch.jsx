@@ -16,10 +16,11 @@ app.displayDialogs = DialogModes.NO;
 var folderMain, folderMatch, folderPSD, filesMatch, filesPSD;
 var listMatch = [];
 var listPSD = [];
+var missingMatch = [];
 var previousImage, failedToCopy;
 var processedFiles = 0;
 var customOpt = false;
-var promptLoc = false;
+var showMatch = false;
 /*
 listMatch = [
     {
@@ -107,9 +108,13 @@ function init() {
         }
         if (returnBack) return;
     } else {
-        folderMatch = new Folder(scriptFolder + "/Garments to Colour Match");
+        folderMatch = Folder.selectDialog("Select the folder including colour match files");
+        if (folderMatch == null) return;
+        // folderMatch = new Folder(scriptFolder + "/Garments to Colour Match");
         // if (!folderMatch.exist) throw new Error("The folder \"Garments to Colour Match\" does not exist in the script location");
-        folderPSD = new Folder(scriptFolder + "/Images to work on");
+        folderPSD = Folder.selectDialog("Select the folder including PSD files");
+        if (folderPSD == null) return;
+        // folderPSD = new Folder(scriptFolder + "/Images to work on");
         // if (!folderPSD.exist) throw new Error("The folder \"Images to work on\" does not exist in the script location");
     }
 
@@ -163,7 +168,6 @@ function main() {
 
             open(listPSD[i].file);
             try {
-
                 // if (activeDocument.layers.length > 1) throw new Error(activeDocument.name + " has a populated layer structure");
                 try {
                     activeDocument.activeLayer = activeDocument.layerSets.getByName("Garment Colour Match");
@@ -179,14 +183,13 @@ function main() {
                             desc209.putBoolean( idinPlace, true );
                         executeAction( idpast, desc209, DialogModes.NO );
                     } catch(e) {
-                        var docMatch = open(listPSD[i].match);
-                        activeDocument.selection.selectAll();
-                        activeDocument.selection.copy();
-                        docMatch.close(SaveOptions.DONOTSAVECHANGES);
-
-                        activeDocument.paste();
+                        getTheMatch();
                     }
                 } else {
+                    getTheMatch();
+                }
+
+                function getTheMatch() {
                     var docMatch = open(listPSD[i].match);
                     activeDocument.selection.selectAll();
                     activeDocument.selection.copy();
@@ -214,7 +217,7 @@ function main() {
                     functionLayerColour("Grey");
 
                     lyrMatch.move(grpMatch, ElementPlacement.INSIDE);
-                    grpMatch.visible = false;
+                    grpMatch.visible = showMatch;
                     activeDocument.activeLayer = grpMatch;
                     try { 
                         var idcopy = charIDToTypeID( "copy" );
@@ -224,6 +227,8 @@ function main() {
                         failedToCopy = true;
                     }
                 }
+
+                activeDocument.activeLayer.move(activeDocument.layers[0], ElementPlacement.PLACEBEFORE);
 
                 activeDocument.activeLayer = activeDocument.layers[activeDocument.layers.length - 1];
 
@@ -236,19 +241,36 @@ function main() {
             previousImage = listPSD[i];
             processedFiles++;
 
+        } else {
+            var addMissing = true;
+            for (i_missing = 0; i_missing < missingMatch.length; i_missing++) {
+                if (missingMatch[i_missing] == listPSD[i].id) {
+                    addMissing = false;
+                    break;
+                }
+            }
+            if (addMissing) missingMatch.push(listPSD[i].id);
         }
     }
 
     var d = new Date();
     var timeEnd = d.getTime() / 1000;
     var timeFull = timeEnd - timeStart;
+
+    var completionText = processedFiles + " files processed!\nTime elapsed " + formatSeconds(timeFull);
+
+    if (missingMatch.length != 0) {
+        saveTxt(missingMatch.join("\n"), "IDs_MISSING_MATCH_FILES", folderPSD, ".txt");
+        completionText = completionText + "\n\nSome garments are missing a match file. Log saved in the PSD directory.";
+    }
+
     if (errorLog.length != 1) {
         var date = d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate() + " " + d.getHours() + ":" + d.getMinutes();
-        saveTxt(date + "\n" + processedFiles + " files processed\n\n" + errorLog.join("\n---\n"), "ERRORLOG", scriptFolder, ".txt");
-        alert(processedFiles + " files processed!\nTime elapsed " + formatSeconds(timeFull) + "\n\n" + errorLog.join("\n"));
-    } else {
-        alert(processedFiles + " files processed!\nTime elapsed " + formatSeconds(timeFull));
+        saveTxt(date + "\n" + processedFiles + " files processed\n\n" + errorLog.join("\n---\n"), "ERRORLOG", folderPSD, ".txt");
+        completionText = completionText + "\n\nThe script encountered errors. Log saved in the PSD directory.";
     }
+
+    alert(completionText);
 
 }
 
