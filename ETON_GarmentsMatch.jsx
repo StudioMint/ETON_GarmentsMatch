@@ -149,17 +149,31 @@ function main() {
 
     for (i = 0; i < listPSD.length; i++) {
         var matchStatus = 0; // 0 is no colour match angle found, low is low satisfaction in angle selection
+        var shorts = false;
+        if (listPSD[i].id.substring(0, 1) == "A") shorts = true;
         for (j = 0; j < listMatch.length; j++) {
             if (listMatch[j].id == listPSD[i].id) {
-                switch (listMatch[j].angle) {
-                    case "tshov_1": if (matchStatus < 5) listPSD[i].match = listMatch[j].file; matchStatus = 5; break;
-                    case "tshgh_1": if (matchStatus < 4) listPSD[i].match = listMatch[j].file; matchStatus = 4; break;
-                    case "tshco_1": if (matchStatus < 3) listPSD[i].match = listMatch[j].file; matchStatus = 3; break;
-                    case "tshde_1": if (matchStatus < 2) listPSD[i].match = listMatch[j].file; matchStatus = 2; break;
-                    case "tshpi_1": if (matchStatus < 1) listPSD[i].match = listMatch[j].file; matchStatus = 1; break;
+                if (!shorts) {
+                    switch (listMatch[j].angle) {
+                        // Shirts
+                        case "tshov_1": if (matchStatus < 5) listPSD[i].match = listMatch[j].file; matchStatus = 5; break;
+                        case "tshgh_1": if (matchStatus < 4) listPSD[i].match = listMatch[j].file; matchStatus = 4; break;
+                        case "tshco_1": if (matchStatus < 3) listPSD[i].match = listMatch[j].file; matchStatus = 3; break;
+                        case "tshde_1": if (matchStatus < 2) listPSD[i].match = listMatch[j].file; matchStatus = 2; break;
+                        case "tshpi_1": if (matchStatus < 1) listPSD[i].match = listMatch[j].file; matchStatus = 1; break;
+                    }
+                } else {
+                    switch (listMatch[j].angle) {
+                        // Shorts
+                        case "tssfr_1": if (matchStatus < 5) listPSD[i].match = listMatch[j].file; matchStatus = 5; break;
+                        case "tssgf_1": if (matchStatus < 4) listPSD[i].match = listMatch[j].file; matchStatus = 4; break;
+                        case "tssba_1": if (matchStatus < 3) listPSD[i].match = listMatch[j].file; matchStatus = 3; break;
+                        case "tssgb_1": if (matchStatus < 2) listPSD[i].match = listMatch[j].file; matchStatus = 2; break;
+                        case "tssde_1": if (matchStatus < 1) listPSD[i].match = listMatch[j].file; matchStatus = 1; break;
+                    }
                 }
             }
-            if (matchStatus == 5) continue;
+            if (matchStatus == 5) break;
         }
     }
 
